@@ -31,6 +31,22 @@ int stableCount=0;
 ros::Publisher res_pub;
 std_msgs::Int16 res;
 
+void imgcap(Mat& color, Mat& depth);
+
+int main (int argc, char** argv)
+{
+	ros::init(argc, argv, "recg_node");
+    //声明节点句柄
+    ros::NodeHandle nh;
+	res_pub = nh.advertise<std_msgs::Int16>("/result", 1);
+	Mat depth,color;
+	while(ros::ok())
+	{
+		imgcap(color,depth);
+		//imgprocess(color,depth);
+	}
+}
+
 float get_depth_scale(rs2::device dev)
 {
     // Go over the device's sensors
@@ -132,13 +148,12 @@ void imgcap(Mat& color, Mat& depth)
 	cfg.enable_stream(RS2_STREAM_DEPTH, WIDTH, HEIGHT, RS2_FORMAT_Z16, 30);
 	rs2::pipeline_profile selection = pipe.start(cfg);
 
-	bool stop = false;
 	int k = 0;
 	
 	rs2_stream align_to = RS2_STREAM_COLOR;
 	rs2::align align(align_to);
 
-	while (!stop)
+	while (ros::ok())
 	 {
 		rs2::frameset frames;
 		frames = pipe.wait_for_frames();
@@ -172,19 +187,5 @@ void imgcap(Mat& color, Mat& depth)
 				imgprocess(color,depth);
 			}
 		}
-	}
-}
-
-int main (int argc, char** argv)
-{
-	ros::init(argc, argv, "recg_node");
-    //声明节点句柄
-    ros::NodeHandle nh;
-	ros::Publisher res_pub = nh.advertise<std_msgs::Int16>("/result", 1);
-	Mat depth,color;
-	while(ros::ok())
-	{
-		imgcap(color,depth);
-		//imgprocess(color,depth);
 	}
 }

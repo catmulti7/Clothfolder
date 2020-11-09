@@ -1,0 +1,5 @@
+<launch>
+  <node name="serial_common_node" pkg="serial_common" type="serial_common_node" output="screen"></node>
+   <node name="recg_node" pkg="recg" type="recg_node" required="true" output="screen"></node>
+
+</launch>

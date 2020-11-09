@@ -3,9 +3,10 @@
 #include <std_msgs/Int16.h>
 #include <serial/serial.h>
 #include <std_msgs/String.h>
+#include<iostream>
 #include "iomanip"
 #include <stdlib.h>
-#define DATA_LEN 12
+#define DATA_LEN 2
 
 serial::Serial ser;//声明串口对象
 //serial_common::gimbal receive_msg;
@@ -28,9 +29,13 @@ void write_callback(const std_msgs::Int16ConstPtr& msg)
 {
     uint8_t Buffer[DATA_LEN];
     Buffer[0] = 0xFF;
-    Buffer[1]=DATA_LEN;
-    Data_disintegrate(msg->data, &Buffer[2], &Buffer[3]);
-    Buffer[DATA_LEN - 1] = Add_CRC(Buffer, DATA_LEN - 1);//CRC：
+    if(msg->data==0)
+        Buffer[1] = 0;
+    if(msg->data==1)
+        Buffer[1] = 1;
+    if(msg->data==2)
+        Buffer[1] = 2;
+    //Data_disintegrate(msg->data, &Buffer[2], &Buffer[3]);
     ser.write(Buffer,DATA_LEN);   //发送串口数据
 }
 
@@ -47,24 +52,25 @@ int main (int argc, char** argv)
 {
     //初始化节点
     ros::init(argc, argv, "serial_common_node");
-
+    
     //声明节点句柄
     ros::NodeHandle nh;
 
     //订阅主题，并配置回调函数
-    ros::Subscriber write_sub = nh.subscribe("write", 33, write_callback);
+    ros::Subscriber write_sub = nh.subscribe("/result", 33, write_callback);
 
     //设置串口属性，并打开串口
-    const char *usb_ttl=getenv("usb_ttl");
-
+    //const char *usb_ttl=getenv("usb_ttl");
+    const char *usb_ttl=NULL;
     if(usb_ttl==NULL)
     {
+      ROS_WARN_STREAM("SYSTEM INIT");
       ser.setPort("/dev/ttyUSB0");
       ser.setBaudrate(115200);
       serial::Timeout to = serial::Timeout::simpleTimeout(1000);
       ser.setTimeout(to);
       ser.open();
-      ROS_WARN_STREAM("SYSTEM USB NOT DETECTED");
+      ROS_WARN_STREAM("SYSTEM USB DETECTED");
       if(!ser.isOpen())
       {
           ser.setPort("/dev/ttyUSB1");
