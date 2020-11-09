@@ -1,0 +1,3 @@
+/home/catmulti7/ClothFolder/src/build/CMakeFiles/rebuild_cache.dir
+/home/catmulti7/ClothFolder/src/build/CMakeFiles/ClothFolder.dir
+/home/catmulti7/ClothFolder/src/build/CMakeFiles/edit_cache.dir
