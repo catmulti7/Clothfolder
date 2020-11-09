@@ -65,7 +65,10 @@ void imgprocess(Mat& color, Mat& depth)
 {
 	
 	Mat binDepth;
-	inRange(depth,100,200,binDepth);
+	inRange(depth,130,240,binDepth);
+	Mat kernel=getStructuringElement(MORPH_RECT,Size(5,5));
+	erode(binDepth,binDepth,kernel);
+	erode(binDepth,binDepth,kernel);
 	//threshold(depth,binDepth,100,255,THRESH_BINARY);
 	//imshow("binImg",binDepth);
 	Rect cloth=boundingRect(binDepth);
