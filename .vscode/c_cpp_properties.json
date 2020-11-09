@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "ROS",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/include/opencv4/**",
+                "/home/catmulti7/CF/devel/include/**",
+                "/opt/ros/melodic/include/**"
+            ],
+    "intelliSenseMode": "gcc-x64",
+    "compilerPath": "/usr/bin/gcc",
+    "cStandard": "c11",
+    "cppStandard": "c++17",
+    "configurationProvider": "go2sh.cmake-integration"
+        }
+    ],
+    "version": 4
+}

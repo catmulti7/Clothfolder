@@ -1,3 +1,5 @@
+#include"ros/ros.h"
+#include"std_msgs/Int16.h"
 #include <iostream>
 #include<string>
 #include <stdlib.h>
@@ -26,6 +28,8 @@ using namespace cv;
 #define FPS 30
 
 int stableCount=0;
+ros::Publisher res_pub;
+std_msgs::Int16 res;
 
 float get_depth_scale(rs2::device dev)
 {
@@ -53,8 +57,9 @@ void imgprocess(Mat& color, Mat& depth)
 	{
 		cout<<"no cloth"<<endl;
 		stableCount=0;
+		res.data=0;
+		res_pub.publish(res);
 		return;
-		
 	}
 
 	stableCount++;
@@ -96,9 +101,17 @@ void imgprocess(Mat& color, Mat& depth)
 	if(stableCount>10)
 	{
 		if(density1>0.6 && density2>0.6 &&density3>0.6)
-		cout<<"cloth"<<endl;
+		{
+			cout<<"cloth"<<endl;
+			res.data=1;
+		}
+		
 		else
-		cout<<"trousers"<<endl;
+		{
+			cout<<"trousers"<<endl;
+			res.data=2;
+		}
+		res_pub.publish(res);
 	}
 }
 
@@ -164,8 +177,12 @@ void imgcap(Mat& color, Mat& depth)
 
 int main (int argc, char** argv)
 {
+	ros::init(argc, argv, "recg_node");
+    //声明节点句柄
+    ros::NodeHandle nh;
+	ros::Publisher res_pub = nh.advertise<std_msgs::Int16>("/result", 1);
 	Mat depth,color;
-	while(true)
+	while(ros::ok())
 	{
 		imgcap(color,depth);
 		//imgprocess(color,depth);
