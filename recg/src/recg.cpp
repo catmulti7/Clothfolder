@@ -65,7 +65,7 @@ void imgprocess(Mat& color, Mat& depth)
 {
 	
 	Mat binDepth;
-	inRange(depth,140,240,binDepth);
+	inRange(depth,140,210,binDepth);
 	Mat kernel=getStructuringElement(MORPH_RECT,Size(7,5));
 	erode(binDepth,binDepth,kernel);
 	erode(binDepth,binDepth,kernel);
@@ -75,7 +75,7 @@ void imgprocess(Mat& color, Mat& depth)
 	//imshow("binImg",binDepth);
 	Rect cloth=boundingRect(binDepth);
 
-	if(cloth.area()<1000)
+	if(cloth.area()<19000)
 	{
 		cout<<cloth.area()<<endl;
 		cout<<"no cloth"<<endl;
@@ -89,9 +89,9 @@ void imgprocess(Mat& color, Mat& depth)
 
 	rectangle(color,cloth,Scalar(20,20,255),2);
 	rectangle(depth,cloth,Scalar(100),2);
-	// imshow("Display deep", depth);
-	// imshow("Display Image", color);
-	// waitKey(5);
+	imshow("Display deep", depth);
+	imshow("Display Image", color);
+	waitKey(1);
 
 	
 	float density1=0;
@@ -123,7 +123,7 @@ void imgprocess(Mat& color, Mat& depth)
 	waitKey(5);
 	if(stableCount>10)
 	{
-		if(density1>0.6 && density2>0.6 &&density3>0.6)
+		if(density1>0.5 && density2>0.5 &&density3>0.5)
 		{
 			cout<<"cloth"<<endl;
 			res.data=1;
@@ -142,6 +142,7 @@ void imgcap(Mat& color, Mat& depth)
 {
 	// judge whether devices is exist or not 
 	rs2::context ctx;
+	rs2::colorizer color_map;
 	auto list = ctx.query_devices(); // Get a snapshot of currently connected devices
 	if (list.size() == 0) 
 		throw std::runtime_error("No device detected. Is it plugged in?");
@@ -154,6 +155,7 @@ void imgcap(Mat& color, Mat& depth)
 	cfg.enable_stream(RS2_STREAM_COLOR, WIDTH, HEIGHT, RS2_FORMAT_BGR8, 30);
 	cfg.enable_stream(RS2_STREAM_DEPTH, WIDTH, HEIGHT, RS2_FORMAT_Z16, 30);
 	rs2::pipeline_profile selection = pipe.start(cfg);
+	
 
 	int k = 0;
 	
@@ -172,11 +174,13 @@ void imgcap(Mat& color, Mat& depth)
 		//Get each frame
 		auto color_frame = frames.get_color_frame();
 		auto depth_frame = frames.get_depth_frame();
+		auto depth_colored_frame = frames.get_depth_frame().apply_filter(color_map);
 		
 
 		//create cv::Mat from rs2::frame
 		Mat color(Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), Mat::AUTO_STEP);
 		Mat deep(Size(640, 480), CV_16UC1, (void*)depth_frame.get_data(), Mat::AUTO_STEP);
+		Mat depth_colored(Size(640, 480), CV_8UC3, (void*)depth_colored_frame.get_data(), Mat::AUTO_STEP);
 
 		if (!deep.empty())
 		{
@@ -188,9 +192,9 @@ void imgcap(Mat& color, Mat& depth)
 
 			if(!color.empty()&&!depth.empty())
 			{
-				imshow("Display Image", color);
-				imshow("Display deep", depth);
-				waitKey(1);
+				// imshow("Display Image", color);
+				 imshow("Display colored depth", depth_colored);
+				 waitKey(1);
 				imgprocess(color,depth);
 			}
 		}
