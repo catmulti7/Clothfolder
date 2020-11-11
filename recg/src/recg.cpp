@@ -74,6 +74,7 @@ void imgprocess(Mat& color, Mat& depth)
 	//threshold(depth,binDepth,100,255,THRESH_BINARY);
 	//imshow("binImg",binDepth);
 	Rect cloth=boundingRect(binDepth);
+
 	if(cloth.area()<1000)
 	{
 		cout<<cloth.area()<<endl;
@@ -88,9 +89,9 @@ void imgprocess(Mat& color, Mat& depth)
 
 	rectangle(color,cloth,Scalar(20,20,255),2);
 	rectangle(depth,cloth,Scalar(100),2);
-	imshow("Display deep", depth);
-	imshow("Display Image", color);
-	waitKey(5);
+	// imshow("Display deep", depth);
+	// imshow("Display Image", color);
+	// waitKey(5);
 
 	
 	float density1=0;
