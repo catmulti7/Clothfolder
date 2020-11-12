@@ -73,11 +73,12 @@ void imgprocess(Mat& color, Mat& depth)
 	dilate(binDepth,binDepth,kernel2);
 	//threshold(depth,binDepth,100,255,THRESH_BINARY);
 	//imshow("binImg",binDepth);
+	Rect mask(30,0,580,480);
+	Mat depimg=binDepth(mask).clone();
 	Rect cloth=boundingRect(binDepth);
 
-	if(cloth.area()<19000)
+	if(cloth.area()<20000)
 	{
-		cout<<cloth.area()<<endl;
 		cout<<"no cloth"<<endl;
 		stableCount=0;
 		res.data=0;
@@ -134,6 +135,8 @@ void imgprocess(Mat& color, Mat& depth)
 			cout<<"trousers"<<endl;
 			res.data=2;
 		}
+		cout<<"height is "<<cloth.height<<endl;
+		cout<<"width is"<<cloth.width<<endl;
 		res_pub.publish(res);
 	}
 }
