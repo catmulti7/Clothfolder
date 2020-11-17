@@ -1,4 +1,6 @@
 <launch>
+  <param name="min_dist" value="140"/>
+  <param name="max_dist" value="210"/>
   <node name="serial_common_node" pkg="serial_common" type="serial_common_node" output="screen"></node>
    <node name="recg_node" pkg="recg" type="recg_node" required="true" output="screen"></node>
 

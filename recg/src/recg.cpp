@@ -32,13 +32,16 @@ ros::Publisher res_pub;
 std_msgs::Int16 res;
 
 void imgcap(Mat& color, Mat& depth);
-
+int mindist,maxdist;
 int main (int argc, char** argv)
 {
 	ros::init(argc, argv, "recg_node");
     //声明节点句柄
     ros::NodeHandle nh;
 	res_pub = nh.advertise<std_msgs::Int16>("/result", 1);
+	nh.getParam("/min_dist",mindist);
+	nh.getParam("/max_dist",maxdist);
+	cout<<mindist<<" "<<maxdist<<endl;
 	Mat depth,color;
 	while(ros::ok())
 	{
@@ -65,7 +68,7 @@ void imgprocess(Mat& color, Mat& depth)
 {
 	
 	Mat binDepth;
-	inRange(depth,140,210,binDepth);
+	inRange(depth,mindist,maxdist,binDepth);
 	Mat kernel=getStructuringElement(MORPH_RECT,Size(7,5));
 	erode(binDepth,binDepth,kernel);
 	erode(binDepth,binDepth,kernel);
@@ -136,7 +139,7 @@ void imgprocess(Mat& color, Mat& depth)
 			res.data=2;
 		}
 		cout<<"height is "<<cloth.height<<endl;
-		cout<<"width is"<<cloth.width<<endl;
+		cout<<"width is "<<cloth.width<<endl;
 		res_pub.publish(res);
 	}
 }
